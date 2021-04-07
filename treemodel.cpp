@@ -1,5 +1,6 @@
 #include "treemodel.h"
 #include <QDebug>
+#include <QPixmap>
 
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
@@ -55,9 +56,30 @@ int TreeModel::columnCount(const QModelIndex &parent) const
 QVariant TreeModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid()) return QVariant();
-    if(role == Qt::DisplayRole)
+    switch (role)
+    {
+    case Qt::DisplayRole:
         return objByIndex(index)->property(_columns.at(index.column()).toUtf8());
+    case Qt::DecorationRole:
+    {
+        if(objByIndex(index)->property("status") != QVariant())
+        {
+            QPixmap *status = new QPixmap(16,16);
+            status->fill(Qt::green);
+            return *status;
+        }
+        return QVariant();
+    }
+    default:
+        return QVariant();
+    }
 
+}
+
+QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
+        return _columns.at(section);
     return QVariant();
 }
 

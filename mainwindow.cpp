@@ -12,16 +12,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     QStringList cols;
-    cols.append("objectName");
+    cols << "objectName" << "m_idDev" ;
     model = new TreeModel(this);
     model->setColumns(cols);
 
     Place *pl = new Place("Box 1");
     Port *port1 = new Port("COM1", pl);
+    port1->setStatus(true);
     Port *port2 = new Port("COM2", pl);
     Port *port3 = new Port("COM3", pl);
     {
         Device *dev1 = new Device("DOZOR-C",2, port1);
+        dev1->setStatus(true);
     }
     {
         Device *dev1 = new Device("MVA8",2, port2);
@@ -37,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent)
     model->addItem(pl, QModelIndex());
 
     ui->treeView->setModel(model);
+    ui->columnView->setModel(model);
+    ui->tableView->setModel(model);
+//    ui->treeView->setWordWrap(true);
 }
 
 MainWindow::~MainWindow()

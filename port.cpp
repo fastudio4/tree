@@ -5,6 +5,8 @@ Port::Port(QString name, QObject *parent)
 {
     m_name = name;
     setObjectName(m_name);
+    m_status = false;
+    m_error.clear();
 }
 
 Port::~Port()
