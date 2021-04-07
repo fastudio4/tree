@@ -1,18 +1,41 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "data.h"
 #include "place.h"
 #include "port.h"
-#include <QDebug>
+#include "device.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    fillData();
+
+    QStringList cols;
+    cols.append("objectName");
     model = new TreeModel(this);
-    model->setDataModel(d);
+    model->setColumns(cols);
+
+    Place *pl = new Place("Box 1");
+    Port *port1 = new Port("COM1", pl);
+    Port *port2 = new Port("COM2", pl);
+    Port *port3 = new Port("COM3", pl);
+    {
+        Device *dev1 = new Device("DOZOR-C",2, port1);
+    }
+    {
+        Device *dev1 = new Device("MVA8",2, port2);
+        Device *dev2 = new Device("MVA8",3, port2);
+        Device *dev3 = new Device("MVA8",4, port2);
+    }
+    {
+        Device *dev1 = new Device("MU110",2, port3);
+        Device *dev2 = new Device("MU110",3, port3);
+    }
+
+
+    model->addItem(pl, QModelIndex());
+
     ui->treeView->setModel(model);
 }
 
@@ -23,15 +46,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::fillData()
 {
-    d = new Data();
 
-    Place *box1 = new Place("Box 1");
-    Place *box2 = new Place("Box 2");
-    Place *box3 = new Place("Box 3");
-
-    d->addPlace(box1);
-    d->addPlace(box2);
-    d->addPlace(box3);
 
 }
 

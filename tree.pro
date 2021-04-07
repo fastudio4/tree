@@ -16,7 +16,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    data.cpp \
     device.cpp \
     function.cpp \
     main.cpp \
@@ -26,7 +25,6 @@ SOURCES += \
     treemodel.cpp
 
 HEADERS += \
-    data.h \
     device.h \
     function.h \
     mainwindow.h \

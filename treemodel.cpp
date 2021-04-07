@@ -4,75 +4,68 @@
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    root = new Data(this);
+    _rootItem = new QObject(this);
+}
+
+void TreeModel::setColumns(QStringList cols)
+{
+    _columns = cols;
+}
+
+void TreeModel::addItem(QObject *item, const QModelIndex &parentIdx)
+{
+    beginInsertRows(parentIdx, rowCount(parentIdx), rowCount(parentIdx));
+    item->setParent(objByIndex(parentIdx));
+    endInsertRows();
 }
 
 TreeModel::~TreeModel()
 {
-    delete root;
+    delete _rootItem;
 }
 
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
     if(!hasIndex(row, column, parent)) return QModelIndex();
-    Data *parentData;
-    if(!parent.isValid()) parentData = root;
-    else
-    {
-        parentData = static_cast<Data*>(parent.internalPointer());
-    }
-    Place *pl = parentData->place(row);
-    if(pl) return createIndex(row, column, pl);
-    return QModelIndex();
-
+    QObject *parentObj = objByIndex(parent);
+    return createIndex(row, column, parentObj->children().at(row));
 }
 
-QModelIndex TreeModel::parent(const QModelIndex &index) const
+QModelIndex TreeModel::parent(const QModelIndex &child) const
 {
-    if(!index.isValid()) return QModelIndex();
-    Place *pl = static_cast<Place *>(index.internalPointer());
-    Data *parentData = static_cast<Data*>(pl->parent());
-    if(parentData == root) return QModelIndex();
-    return createIndex(parentData->row(), 0, parentData);
+    QObject *childObj = objByIndex(child);
+    QObject *parentObj = childObj->parent();
+    if(parentObj == _rootItem) return QModelIndex();
+    QObject *grandParentObj = parentObj->parent();
+    int row = grandParentObj->children().indexOf(parentObj);
+    return createIndex(row, 0, parentObj);
 }
 
 int TreeModel::rowCount(const QModelIndex &parent) const
 {
-
-    if (parent.column() > 0) return 0;
-    Data *parentData;
-    if (!parent.isValid()) parentData = root;
-    else
-    {
-        parentData = static_cast<Data*>(parent.internalPointer());
-    }
-    return parentData->children().count();
+    return objByIndex(parent)->children().count();
 }
 
 int TreeModel::columnCount(const QModelIndex &parent) const
 {
-
-//    if (parent.isValid()) return 1;
-
-    return 1;
+    Q_UNUSED(parent)
+    return _columns.count();
 }
 
 QVariant TreeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid()) return QVariant();
+    if(!index.isValid()) return QVariant();
     if(role == Qt::DisplayRole)
-    {
-         Data *data = static_cast<Data*>(index.internalPointer());
-         return data->place(index.row())->namePlace();
-    }
+        return objByIndex(index)->property(_columns.at(index.column()).toUtf8());
+
     return QVariant();
 }
 
-void TreeModel::setDataModel(Data *data)
-{   
-    data->setParent(root);
+QObject *TreeModel::objByIndex(const QModelIndex &index) const
+{
+    if(!index.isValid()) return _rootItem;
+    return static_cast<QObject*>(index.internalPointer());
 }
-
 
 
 

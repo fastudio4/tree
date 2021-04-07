@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 #include "treemodel.h"
-#include "data.h"
-#include "place.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +20,6 @@ public:
 private:
     Ui::MainWindow *ui;
     TreeModel *model;
-    Data *d;
+
 };
 #endif // MAINWINDOW_H
